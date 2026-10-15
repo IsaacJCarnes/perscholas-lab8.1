@@ -125,5 +125,45 @@
         </p>
       </section>
     </main>
+
+    <template id="deck-template">
+      <article class="deck-card">
+        <button class="deck-open" type="button">
+          <span class="deck-icon" aria-hidden="true">▤</span>
+          <span class="deck-details">
+            <strong data-deck-name></strong>
+            <span data-deck-card-count></span>
+          </span>
+        </button>
+        <input
+          class="selection-checkbox"
+          type="checkbox"
+          hidden
+          aria-label="Select deck"
+        />
+      </article>
+    </template>
+
+    <template id="card-template">
+      <article class="flashcard">
+        <span class="card-number"></span>
+        <div class="flashcard-content">
+          <div class="flashcard-side">
+            <span class="side-label">FRONT</span>
+            <p data-card-front></p>
+          </div>
+          <div class="flashcard-side flashcard-back">
+            <span class="side-label">BACK</span>
+            <p data-card-back></p>
+          </div>
+        </div>
+        <input
+          class="selection-checkbox"
+          type="checkbox"
+          hidden
+          aria-label="Select card"
+        />
+      </article>
+    </template>
   </body>
 </html>

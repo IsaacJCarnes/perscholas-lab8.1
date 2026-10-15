@@ -8,6 +8,8 @@ const deckForm = document.querySelector("#deck-form");
 const cardForm = document.querySelector("#card-form");
 const deckList = document.querySelector("#deck-list");
 const cardList = document.querySelector("#card-list");
+const deckTemplate = document.querySelector("#deck-template");
+const cardTemplate = document.querySelector("#card-template");
 const deckEmpty = document.querySelector("#deck-empty");
 const cardEmpty = document.querySelector("#card-empty");
 const appMessage = document.querySelector("#app-message");
@@ -134,17 +136,6 @@ function updateCardSelectionControls(deck) {
     totalCards === 0 || selectedCardIds.size === totalCards;
 }
 
-function createSelectionControl(label, id, checked, hidden) {
-  const control = document.createElement("input");
-  control.className = "selection-checkbox";
-  control.type = "checkbox";
-  control.checked = checked;
-  control.hidden = hidden;
-  control.dataset.itemId = id;
-  control.setAttribute("aria-label", `Select ${label}`);
-  return control;
-}
-
 function handleSelectionChange(event) {
   if (!(event.target instanceof HTMLInputElement)) return;
   const control = event.target;
@@ -180,40 +171,21 @@ function renderDecks() {
   updateDeckSelectionControls();
 
   for (const deck of decks) {
-    const item = document.createElement("article");
-    item.className = "deck-card";
+    const item = deckTemplate.content.firstElementChild.cloneNode(true);
+    const openButton = item.querySelector(".deck-open");
+    const selectionControl = item.querySelector(".selection-checkbox");
+
+    item.querySelector("[data-deck-name]").textContent = deck.name;
+    item.querySelector("[data-deck-card-count]").textContent =
+      `${deck.cards.length} ${deck.cards.length === 1 ? "card" : "cards"}`;
+    openButton.dataset.deckId = deck.id;
+    selectionControl.dataset.itemId = deck.id;
+    selectionControl.checked = selectedDeckIds.has(deck.id);
+    selectionControl.hidden = !deckSelectionMode;
+    selectionControl.setAttribute("aria-label", `Select ${deck.name}`);
+
     if (selectedDeckIds.has(deck.id)) item.classList.add("is-selected");
 
-    const openButton = document.createElement("button");
-    openButton.className = "deck-open";
-    openButton.type = "button";
-    openButton.dataset.deckId = deck.id;
-
-    const icon = document.createElement("span");
-    icon.className = "deck-icon";
-    icon.setAttribute("aria-hidden", "true");
-    icon.textContent = "▤";
-
-    const details = document.createElement("span");
-    details.className = "deck-details";
-
-    const name = document.createElement("strong");
-    name.textContent = deck.name;
-
-    const count = document.createElement("span");
-    count.textContent = `${deck.cards.length} ${deck.cards.length === 1 ? "card" : "cards"}`;
-
-    details.append(name, count);
-    openButton.append(icon, details);
-
-    const selectionControl = createSelectionControl(
-      deck.name,
-      deck.id,
-      selectedDeckIds.has(deck.id),
-      !deckSelectionMode,
-    );
-
-    item.append(openButton, selectionControl);
     deckList.append(item);
   }
 }
@@ -236,46 +208,21 @@ function renderCards() {
   updateCardSelectionControls(deck);
 
   for (const [index, card] of deck.cards.entries()) {
-    const item = document.createElement("article");
-    item.className = "flashcard";
+    const item = cardTemplate.content.firstElementChild.cloneNode(true);
+    const selectionControl = item.querySelector(".selection-checkbox");
+
+    item.querySelector(".card-number").textContent =
+      `CARD ${String(index + 1).padStart(2, "0")}`;
+    item.querySelector("[data-card-front]").textContent = card.front;
+    item.querySelector("[data-card-back]").textContent = card.back;
+    selectionControl.dataset.itemId = card.id;
+    selectionControl.checked = selectedCardIds.has(card.id);
+    selectionControl.hidden = !cardSelectionMode;
+    selectionControl.setAttribute("aria-label", `Select ${card.front}`);
+
     if (cardSelectionMode) item.classList.add("has-selection");
     if (selectedCardIds.has(card.id)) item.classList.add("is-selected");
 
-    const number = document.createElement("span");
-    number.className = "card-number";
-    number.textContent = `CARD ${String(index + 1).padStart(2, "0")}`;
-
-    const content = document.createElement("div");
-    content.className = "flashcard-content";
-
-    const front = document.createElement("div");
-    front.className = "flashcard-side";
-    const frontLabel = document.createElement("span");
-    frontLabel.className = "side-label";
-    frontLabel.textContent = "FRONT";
-    const frontText = document.createElement("p");
-    frontText.textContent = card.front;
-    front.append(frontLabel, frontText);
-
-    const back = document.createElement("div");
-    back.className = "flashcard-side flashcard-back";
-    const backLabel = document.createElement("span");
-    backLabel.className = "side-label";
-    backLabel.textContent = "BACK";
-    const backText = document.createElement("p");
-    backText.textContent = card.back;
-    back.append(backLabel, backText);
-
-    content.append(front, back);
-
-    const selectionControl = createSelectionControl(
-      card.front,
-      card.id,
-      selectedCardIds.has(card.id),
-      !cardSelectionMode,
-    );
-
-    item.append(number, content, selectionControl);
     cardList.append(item);
   }
 }
@@ -358,7 +305,9 @@ function handleDeckListClick(event) {
   else selectedDeckIds.add(deckId);
   const checked = selectedDeckIds.has(deckId);
   openButton.closest(".deck-card")?.classList.toggle("is-selected", checked);
-  const checkbox = openButton.parentElement?.querySelector(".selection-checkbox");
+  const checkbox = openButton.parentElement?.querySelector(
+    ".selection-checkbox",
+  );
   if (checkbox instanceof HTMLInputElement) checkbox.checked = checked;
   updateDeckSelectionControls();
 }
