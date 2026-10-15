@@ -47,6 +47,7 @@ npm run preview
 - `index.html` contains the page views and HTML templates for decks and cards.
 - `src/main.js` implements deck/card management, search, selection, persistence, and study interactions.
 - `src/style.css` contains the responsive styles and study-card flip animation.
+- `vite.config.js` configures relative production asset paths for subpath hosting such as GitHub Pages.
 
 ## Technical notes
 
