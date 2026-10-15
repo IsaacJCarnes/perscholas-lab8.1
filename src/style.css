@@ -203,6 +203,22 @@ textarea:focus {
   background: var(--green-dark);
 }
 
+.button-secondary {
+  border-color: #dce3dc;
+  background: white;
+  color: var(--ink);
+}
+
+.button-secondary:hover:not(:disabled) {
+  border-color: #bdcfc1;
+  background: #f7faf7;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
 .button-danger {
   min-height: 36px;
   border-color: #e8dada;
@@ -213,6 +229,42 @@ textarea:focus {
 .button-danger:hover {
   border-color: #d9baba;
   background: #fff8f8;
+}
+
+.toolbar {
+  display: flex;
+  min-height: 42px;
+  align-items: center;
+  gap: 10px;
+  margin-top: 30px;
+}
+
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.selection-count {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.selection-checkbox {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 17px;
+  min-height: 17px;
+  margin: 0;
+  padding: 0;
+  accent-color: var(--green);
+  cursor: pointer;
+}
+
+.deck-card.is-selected,
+.flashcard.is-selected {
+  border-color: #8ab89a;
+  background: #f5faf5;
 }
 
 .list-heading {
@@ -371,13 +423,17 @@ textarea:focus {
 
 .flashcard {
   display: grid;
-  grid-template-columns: 72px 1fr auto;
+  grid-template-columns: 72px minmax(0, 1fr);
   align-items: start;
   gap: 18px;
   padding: 20px;
   border: 1px solid var(--line);
   border-radius: 12px;
   background: var(--surface);
+}
+
+.flashcard.has-selection {
+  grid-template-columns: 72px minmax(0, 1fr) 20px;
 }
 
 .card-number,
@@ -451,8 +507,17 @@ textarea:focus {
     gap: 14px;
   }
 
+  .flashcard.has-selection {
+    grid-template-columns: minmax(0, 1fr) 20px;
+  }
+
   .card-number {
     grid-column: 1 / -1;
+  }
+
+  .flashcard.has-selection .card-number {
+    grid-column: 1;
+    grid-row: 1;
   }
 
   .flashcard-content {
@@ -462,14 +527,28 @@ textarea:focus {
     gap: 14px;
   }
 
+  .flashcard.has-selection .flashcard-content {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .flashcard.has-selection > .selection-checkbox {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
   .flashcard-back {
     padding: 14px 0 0;
     border-top: 1px solid var(--line);
     border-left: 0;
   }
 
-  .flashcard > .button-danger {
-    grid-column: 2;
-    grid-row: 1;
+  .toolbar,
+  .toolbar-actions {
+    flex-wrap: wrap;
+  }
+
+  .toolbar-actions {
+    gap: 6px;
   }
 }
