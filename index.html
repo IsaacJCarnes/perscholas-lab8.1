@@ -45,12 +45,12 @@
         </form>
 
         <div class="toolbar" role="toolbar" aria-label="Deck actions">
-          <button id="deck-select-toggle" class="button button-secondary" type="button">Select</button>
+          <button id="deck-select-toggle" class="button button-secondary" data-action="select" type="button">Select</button>
           <span id="deck-selection-count" class="selection-count" aria-live="polite"></span>
           <div id="deck-selection-actions" class="toolbar-actions" hidden>
-            <button id="deck-select-all" class="button button-secondary" type="button">Select all</button>
-            <button id="deck-delete-selected" class="button button-danger" type="button" disabled>Delete selected</button>
-            <button id="deck-selection-cancel" class="button button-secondary" type="button">Cancel</button>
+            <button id="deck-select-all" class="button button-secondary" data-action="select-all" type="button">Select all</button>
+            <button id="deck-delete-selected" class="button button-danger" data-action="delete" type="button" disabled>Delete selected</button>
+            <button class="button button-secondary" data-action="cancel" type="button">Cancel</button>
           </div>
         </div>
 
@@ -104,12 +104,12 @@
         </form>
 
         <div class="toolbar" role="toolbar" aria-label="Card actions">
-          <button id="card-select-toggle" class="button button-secondary" type="button">Select</button>
+          <button id="card-select-toggle" class="button button-secondary" data-action="select" type="button">Select</button>
           <span id="card-selection-count" class="selection-count" aria-live="polite"></span>
           <div id="card-selection-actions" class="toolbar-actions" hidden>
-            <button id="card-select-all" class="button button-secondary" type="button">Select all</button>
-            <button id="card-delete-selected" class="button button-danger" type="button" disabled>Delete selected</button>
-            <button id="card-selection-cancel" class="button button-secondary" type="button">Cancel</button>
+            <button id="card-select-all" class="button button-secondary" data-action="select-all" type="button">Select all</button>
+            <button id="card-delete-selected" class="button button-danger" data-action="delete" type="button" disabled>Delete selected</button>
+            <button class="button button-secondary" data-action="cancel" type="button">Cancel</button>
           </div>
         </div>
 
