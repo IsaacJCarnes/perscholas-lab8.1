@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Create flashcard decks and practice with your own cards."
+    />
+    <title>Flashcards</title>
+    <script type="module" crossorigin src="./assets/index-zR0zxlY6.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-CfwPCAxA.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="site-header">
+        <a class="brand" href="#" aria-label="Flashcards home">
+          <span class="brand-mark" aria-hidden="true">F</span>
+          <span>Flashcards</span>
+        </a>
+        <p class="header-note">A little practice goes a long way.</p>
+      </header>
+
+      <p id="app-message" class="app-message" role="status" aria-live="polite"></p>
+
+      <section id="deck-view" aria-labelledby="deck-heading">
+        <div class="page-heading">
+          <p class="eyebrow">Your library</p>
+          <h1 id="deck-heading">Your decks</h1>
+          <p class="page-description">Create a deck, then fill it with things you want to remember.</p>
+        </div>
+
+        <form id="deck-form" class="create-form">
+          <label for="deck-name">New deck name</label>
+          <div class="form-row">
+            <input
+              id="deck-name"
+              name="name"
+              type="text"
+              maxlength="80"
+              placeholder="e.g. Spanish vocabulary"
+              required
+            />
+            <button class="button button-primary" type="submit">Create deck</button>
+          </div>
+        </form>
+
+        <div class="toolbar" role="toolbar" aria-label="Deck actions">
+          <button id="deck-select-toggle" class="button button-secondary" data-action="select" type="button">Select</button>
+          <span id="deck-selection-count" class="selection-count" aria-live="polite"></span>
+          <div id="deck-selection-actions" class="toolbar-actions" hidden>
+            <button id="deck-select-all" class="button button-secondary" data-action="select-all" type="button">Select all</button>
+            <button id="deck-delete-selected" class="button button-danger" data-action="delete" type="button" disabled>Delete selected</button>
+            <button class="button button-secondary" data-action="cancel" type="button">Cancel</button>
+          </div>
+        </div>
+
+        <div class="list-heading">
+          <h2>All decks</h2>
+          <span id="deck-count" class="count-badge">0 decks</span>
+        </div>
+        <div id="deck-list" class="deck-grid"></div>
+        <p id="deck-empty" class="empty-state">
+          <span class="empty-icon" aria-hidden="true">✳</span>
+          <strong>No decks yet</strong>
+          <span>Create your first deck above to get started.</span>
+        </p>
+      </section>
+
+      <section id="cards-view" aria-labelledby="cards-heading" hidden>
+        <button id="back-to-decks" class="back-button" type="button">
+          <span aria-hidden="true">←</span> All decks
+        </button>
+
+        <div class="page-heading">
+          <p class="eyebrow">Deck</p>
+          <h1 id="cards-heading"></h1>
+          <p class="page-description">Add a prompt and its answer to make a flashcard.</p>
+        </div>
+
+        <form id="card-form" class="create-form card-create-form">
+          <div class="field">
+            <label for="card-front">Front</label>
+            <textarea
+              id="card-front"
+              name="front"
+              rows="2"
+              maxlength="500"
+              placeholder="Question or prompt"
+              required
+            ></textarea>
+          </div>
+          <div class="field">
+            <label for="card-back">Back</label>
+            <textarea
+              id="card-back"
+              name="back"
+              rows="2"
+              maxlength="500"
+              placeholder="Answer or explanation"
+              required
+            ></textarea>
+          </div>
+          <button class="button button-primary" type="submit">Add card</button>
+        </form>
+
+        <div class="toolbar" role="toolbar" aria-label="Card actions">
+          <button class="button button-primary" data-action="study" type="button" disabled>
+            Study deck
+          </button>
+          <button id="card-select-toggle" class="button button-secondary" data-action="select" type="button">Select</button>
+          <span id="card-selection-count" class="selection-count" aria-live="polite"></span>
+          <div id="card-selection-actions" class="toolbar-actions" hidden>
+            <button id="card-select-all" class="button button-secondary" data-action="select-all" type="button">Select all</button>
+            <button id="card-delete-selected" class="button button-danger" data-action="delete" type="button" disabled>Delete selected</button>
+            <button class="button button-secondary" data-action="cancel" type="button">Cancel</button>
+          </div>
+        </div>
+
+        <div class="list-heading">
+          <h2>Your cards</h2>
+          <span id="card-count" class="count-badge">0 cards</span>
+        </div>
+        <div class="card-search">
+          <label for="card-search">Search cards</label>
+          <input
+            id="card-search"
+            type="search"
+            placeholder="Search front or back"
+            autocomplete="off"
+          />
+        </div>
+        <div id="card-list" class="card-list"></div>
+        <p id="card-empty" class="empty-state">
+          <span class="empty-icon" aria-hidden="true">✳</span>
+          <strong>No cards in this deck</strong>
+          <span>Add your first card above.</span>
+        </p>
+        <p id="card-no-results" class="empty-state" hidden>
+          <strong>No matching cards</strong>
+          <span>Try a different search term.</span>
+        </p>
+      </section>
+
+      <section id="study-view" aria-labelledby="study-heading" hidden>
+        <button id="back-to-cards" class="back-button" type="button">
+          <span aria-hidden="true">←</span> Back to cards
+        </button>
+
+        <div class="page-heading study-heading">
+          <p class="eyebrow">Study mode</p>
+          <h1 id="study-heading"></h1>
+          <p class="page-description">Try to recall the answer, then flip the card to check.</p>
+        </div>
+
+        <div class="study-progress">
+          <span id="study-position"></span>
+          <button id="study-shuffle" class="button button-secondary" type="button">
+            Shuffle
+          </button>
+        </div>
+
+        <button
+          id="study-card"
+          class="study-card"
+          type="button"
+          aria-pressed="false"
+          aria-label="Show the answer"
+        >
+          <span class="study-card-inner">
+            <span class="study-card-face study-card-front">
+              <span class="side-label">FRONT</span>
+              <span id="study-front" class="study-card-text"></span>
+              <span class="study-hint">Click to reveal answer</span>
+            </span>
+            <span class="study-card-face study-card-back" aria-hidden="true">
+              <span class="side-label">BACK</span>
+              <span id="study-back" class="study-card-text"></span>
+              <span class="study-hint">Click to show prompt</span>
+            </span>
+          </span>
+        </button>
+
+        <div class="study-navigation">
+          <button id="study-previous" class="button button-secondary" type="button">
+            <span aria-hidden="true">←</span> Previous
+          </button>
+          <button id="study-next" class="button button-primary" type="button">
+            Next <span aria-hidden="true">→</span>
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <template id="deck-template">
+      <article class="deck-card">
+        <button class="deck-open" type="button">
+          <span class="deck-icon" aria-hidden="true">▤</span>
+          <span class="deck-details">
+            <strong data-deck-name></strong>
+            <span data-deck-card-count></span>
+          </span>
+        </button>
+        <input
+          class="selection-checkbox"
+          type="checkbox"
+          hidden
+          aria-label="Select deck"
+        />
+      </article>
+    </template>
+
+    <template id="card-template">
+      <article class="flashcard">
+        <span class="card-number"></span>
+        <div class="flashcard-content">
+          <div class="flashcard-side">
+            <span class="side-label">FRONT</span>
+            <p data-card-front></p>
+          </div>
+          <div class="flashcard-side flashcard-back">
+            <span class="side-label">BACK</span>
+            <p data-card-back></p>
+          </div>
+        </div>
+        <input
+          class="selection-checkbox"
+          type="checkbox"
+          hidden
+          aria-label="Select card"
+        />
+      </article>
+    </template>
+  </body>
+</html>
