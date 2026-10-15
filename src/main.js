@@ -9,10 +9,12 @@ const deckForm = document.querySelector("#deck-form");
 const cardForm = document.querySelector("#card-form");
 const deckList = document.querySelector("#deck-list");
 const cardList = document.querySelector("#card-list");
+const cardSearchInput = document.querySelector("#card-search");
 const deckTemplate = document.querySelector("#deck-template");
 const cardTemplate = document.querySelector("#card-template");
 const deckEmpty = document.querySelector("#deck-empty");
 const cardEmpty = document.querySelector("#card-empty");
+const cardNoResults = document.querySelector("#card-no-results");
 const appMessage = document.querySelector("#app-message");
 const deckNameInput = document.querySelector("#deck-name");
 const cardFrontInput = document.querySelector("#card-front");
@@ -152,6 +154,13 @@ function updateCardSelectionControls(deck) {
   cardToolbar.querySelector('[data-action="study"]').disabled = totalCards === 0;
 }
 
+function matchesCardSearch(card, searchTerm = cardSearchInput.value.trim().toLowerCase()) {
+  return (
+    card.front.toLowerCase().includes(searchTerm) ||
+    card.back.toLowerCase().includes(searchTerm)
+  );
+}
+
 function handleSelectionChange(event) {
   if (!(event.target instanceof HTMLInputElement)) return;
   const control = event.target;
@@ -216,14 +225,19 @@ function renderCards() {
   cardsHeading.textContent = deck.name;
   cardList.replaceChildren();
   setCardCount(deck.cards.length);
+  const searchTerm = cardSearchInput.value.trim().toLowerCase();
+  const visibleCards = deck.cards
+    .map((card, index) => ({ card, index }))
+    .filter(({ card }) => matchesCardSearch(card, searchTerm));
   cardEmpty.hidden = deck.cards.length > 0;
+  cardNoResults.hidden = deck.cards.length === 0 || visibleCards.length > 0;
 
   for (const id of selectedCardIds) {
     if (!deck.cards.some((card) => card.id === id)) selectedCardIds.delete(id);
   }
   updateCardSelectionControls(deck);
 
-  for (const [index, card] of deck.cards.entries()) {
+  for (const { card, index } of visibleCards) {
     const item = cardTemplate.content.firstElementChild.cloneNode(true);
     const selectionControl = item.querySelector(".selection-checkbox");
 
@@ -375,6 +389,8 @@ cardForm.addEventListener("submit", (event) => {
   cardFrontInput.focus();
 });
 
+cardSearchInput.addEventListener("input", renderCards);
+
 backToDecksButton.addEventListener("click", showDecks);
 backToCardsButton.addEventListener("click", showCards);
 studyCardButton.addEventListener("click", () => {
@@ -445,7 +461,11 @@ function handleToolbarAction(event, itemType) {
       render();
       break;
     case "select-all":
-      for (const item of items) selectedIds.add(item.id);
+      const searchTerm = cardSearchInput.value.trim().toLowerCase();
+      const visibleItems = isDeckToolbar
+        ? items
+        : items.filter((card) => matchesCardSearch(card, searchTerm));
+      for (const item of visibleItems) selectedIds.add(item.id);
       render();
       break;
     case "cancel":

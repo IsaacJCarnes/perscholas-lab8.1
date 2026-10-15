@@ -120,11 +120,24 @@
           <h2>Your cards</h2>
           <span id="card-count" class="count-badge">0 cards</span>
         </div>
+        <div class="card-search">
+          <label for="card-search">Search cards</label>
+          <input
+            id="card-search"
+            type="search"
+            placeholder="Search front or back"
+            autocomplete="off"
+          />
+        </div>
         <div id="card-list" class="card-list"></div>
         <p id="card-empty" class="empty-state">
           <span class="empty-icon" aria-hidden="true">✳</span>
           <strong>No cards in this deck</strong>
           <span>Add your first card above.</span>
+        </p>
+        <p id="card-no-results" class="empty-state" hidden>
+          <strong>No matching cards</strong>
+          <span>Try a different search term.</span>
         </p>
       </section>
 
