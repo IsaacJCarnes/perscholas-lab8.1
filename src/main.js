@@ -187,18 +187,7 @@ function renderDecks() {
     const openButton = document.createElement("button");
     openButton.className = "deck-open";
     openButton.type = "button";
-    openButton.addEventListener("click", () => {
-      if (deckSelectionMode) {
-        if (selectedDeckIds.has(deck.id)) selectedDeckIds.delete(deck.id);
-        else selectedDeckIds.add(deck.id);
-        const checked = selectedDeckIds.has(deck.id);
-        item.classList.toggle("is-selected", checked);
-        item.querySelector(".selection-checkbox").checked = checked;
-        updateDeckSelectionControls();
-        return;
-      }
-      openDeck(deck.id);
-    });
+    openButton.dataset.deckId = deck.id;
 
     const icon = document.createElement("span");
     icon.className = "deck-icon";
@@ -214,13 +203,8 @@ function renderDecks() {
     const count = document.createElement("span");
     count.textContent = `${deck.cards.length} ${deck.cards.length === 1 ? "card" : "cards"}`;
 
-    const arrow = document.createElement("span");
-    arrow.className = "deck-arrow";
-    arrow.setAttribute("aria-hidden", "true");
-    arrow.textContent = "→";
-
     details.append(name, count);
-    openButton.append(icon, details, arrow);
+    openButton.append(icon, details);
 
     const selectionControl = createSelectionControl(
       deck.name,
@@ -355,73 +339,84 @@ cardForm.addEventListener("submit", (event) => {
 
 backToDecksButton.addEventListener("click", showDecks);
 deckList.addEventListener("change", handleSelectionChange);
+deckList.addEventListener("click", handleDeckListClick);
 cardList.addEventListener("change", handleSelectionChange);
 
-deckToolbar.addEventListener("click", (event) => {
+function handleDeckListClick(event) {
+  if (!(event.target instanceof Element)) return;
+  const openButton = event.target.closest("button.deck-open");
+  if (!openButton || !deckList.contains(openButton)) return;
+
+  const deckId = openButton.dataset.deckId;
+  if (!deckId) return;
+  if (!deckSelectionMode) {
+    openDeck(deckId);
+    return;
+  }
+
+  if (selectedDeckIds.has(deckId)) selectedDeckIds.delete(deckId);
+  else selectedDeckIds.add(deckId);
+  const checked = selectedDeckIds.has(deckId);
+  openButton.closest(".deck-card")?.classList.toggle("is-selected", checked);
+  const checkbox = openButton.parentElement?.querySelector(".selection-checkbox");
+  if (checkbox instanceof HTMLInputElement) checkbox.checked = checked;
+  updateDeckSelectionControls();
+}
+
+function handleToolbarAction(event, itemType) {
   if (!(event.target instanceof Element)) return;
   const action = event.target.closest("button[data-action]")?.dataset.action;
   if (!action) return;
 
+  const isDeckToolbar = itemType === "deck";
+  const selectedIds = isDeckToolbar ? selectedDeckIds : selectedCardIds;
+  const items = isDeckToolbar
+    ? decks
+    : decks.find((deck) => deck.id === selectedDeckId)?.cards;
+  const render = isDeckToolbar ? renderDecks : renderCards;
+
+  if (!items) return;
+
   switch (action) {
     case "select":
-      deckSelectionMode = true;
-      selectedDeckIds.clear();
-      renderDecks();
+      if (isDeckToolbar) deckSelectionMode = true;
+      else cardSelectionMode = true;
+      selectedIds.clear();
+      render();
       break;
     case "select-all":
-      for (const deck of decks) selectedDeckIds.add(deck.id);
-      renderDecks();
+      for (const item of items) selectedIds.add(item.id);
+      render();
       break;
     case "cancel":
-      deckSelectionMode = false;
-      selectedDeckIds.clear();
-      renderDecks();
+      if (isDeckToolbar) deckSelectionMode = false;
+      else cardSelectionMode = false;
+      selectedIds.clear();
+      render();
       break;
     case "delete":
-      if (selectedDeckIds.size === 0) return;
-      decks = decks.filter((deck) => !selectedDeckIds.has(deck.id));
-      selectedDeckIds.clear();
-      deckSelectionMode = false;
+      if (selectedIds.size === 0) return;
+      if (isDeckToolbar) {
+        decks = decks.filter((deck) => !selectedIds.has(deck.id));
+        deckSelectionMode = false;
+      } else {
+        const deck = decks.find((item) => item.id === selectedDeckId);
+        if (!deck) return;
+        deck.cards = deck.cards.filter((card) => !selectedIds.has(card.id));
+        cardSelectionMode = false;
+      }
+      selectedIds.clear();
       saveDecks();
-      renderDecks();
+      render();
       break;
   }
-});
+}
 
-cardToolbar.addEventListener("click", (event) => {
-  if (!(event.target instanceof Element)) return;
-  const action = event.target.closest("button[data-action]")?.dataset.action;
-  if (!action) return;
-
-  switch (action) {
-    case "select":
-      cardSelectionMode = true;
-      selectedCardIds.clear();
-      renderCards();
-      break;
-    case "select-all": {
-      const deck = decks.find((item) => item.id === selectedDeckId);
-      if (!deck) return;
-      for (const card of deck.cards) selectedCardIds.add(card.id);
-      renderCards();
-      break;
-    }
-    case "cancel":
-      cardSelectionMode = false;
-      selectedCardIds.clear();
-      renderCards();
-      break;
-    case "delete": {
-      const deck = decks.find((item) => item.id === selectedDeckId);
-      if (!deck || selectedCardIds.size === 0) return;
-      deck.cards = deck.cards.filter((card) => !selectedCardIds.has(card.id));
-      selectedCardIds.clear();
-      cardSelectionMode = false;
-      saveDecks();
-      renderCards();
-      break;
-    }
-  }
-});
+deckToolbar.addEventListener("click", (event) =>
+  handleToolbarAction(event, "deck"),
+);
+cardToolbar.addEventListener("click", (event) =>
+  handleToolbarAction(event, "card"),
+);
 
 renderDecks();
