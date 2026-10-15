@@ -4,6 +4,7 @@ const STORAGE_KEY = "flashcards-decks";
 
 const deckView = document.querySelector("#deck-view");
 const cardsView = document.querySelector("#cards-view");
+const studyView = document.querySelector("#study-view");
 const deckForm = document.querySelector("#deck-form");
 const cardForm = document.querySelector("#card-form");
 const deckList = document.querySelector("#deck-list");
@@ -20,6 +21,7 @@ const cardsHeading = document.querySelector("#cards-heading");
 const deckCount = document.querySelector("#deck-count");
 const cardCount = document.querySelector("#card-count");
 const backToDecksButton = document.querySelector("#back-to-decks");
+const backToCardsButton = document.querySelector("#back-to-cards");
 const deckSelectToggle = document.querySelector("#deck-select-toggle");
 const deckSelectionActions = document.querySelector("#deck-selection-actions");
 const deckSelectionCount = document.querySelector("#deck-selection-count");
@@ -32,6 +34,16 @@ const cardSelectionCount = document.querySelector("#card-selection-count");
 const cardSelectAll = document.querySelector("#card-select-all");
 const cardDeleteSelected = document.querySelector("#card-delete-selected");
 const cardToolbar = document.querySelector("#cards-view .toolbar");
+const studyHeading = document.querySelector("#study-heading");
+const studyPosition = document.querySelector("#study-position");
+const studyCardButton = document.querySelector("#study-card");
+const studyFrontFace = document.querySelector(".study-card-front");
+const studyBackFace = document.querySelector(".study-card-back");
+const studyFront = document.querySelector("#study-front");
+const studyBack = document.querySelector("#study-back");
+const studyShuffleButton = document.querySelector("#study-shuffle");
+const studyPreviousButton = document.querySelector("#study-previous");
+const studyNextButton = document.querySelector("#study-next");
 
 function loadDecks() {
   const savedDecks = localStorage.getItem(STORAGE_KEY);
@@ -65,6 +77,9 @@ let deckSelectionMode = false;
 let cardSelectionMode = false;
 const selectedDeckIds = new Set();
 const selectedCardIds = new Set();
+let studyCardIds = [];
+let studyIndex = 0;
+let studyFlipped = false;
 
 try {
   decks = loadDecks();
@@ -134,6 +149,7 @@ function updateCardSelectionControls(deck) {
   cardDeleteSelected.disabled = selectedCardIds.size === 0;
   cardSelectAll.disabled =
     totalCards === 0 || selectedCardIds.size === totalCards;
+  cardToolbar.querySelector('[data-action="study"]').disabled = totalCards === 0;
 }
 
 function handleSelectionChange(event) {
@@ -241,9 +257,84 @@ function showDecks() {
   selectedDeckId = null;
   cardSelectionMode = false;
   selectedCardIds.clear();
+  studyView.hidden = true;
   cardsView.hidden = true;
   deckView.hidden = false;
   renderDecks();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function renderStudyCard() {
+  const deck = decks.find((item) => item.id === selectedDeckId);
+  const cardId = studyCardIds[studyIndex];
+  const card = deck?.cards.find((item) => item.id === cardId);
+  if (!deck || !card) {
+    studyFront.textContent = "";
+    studyBack.textContent = "";
+    studyPosition.textContent = "No cards to study";
+    studyCardButton.disabled = true;
+    studyPreviousButton.disabled = true;
+    studyNextButton.disabled = true;
+    return;
+  }
+
+  studyHeading.textContent = deck.name;
+  studyFront.textContent = card.front;
+  studyBack.textContent = card.back;
+  studyPosition.textContent = `Card ${studyIndex + 1} of ${studyCardIds.length}`;
+  studyCardButton.disabled = false;
+  studyCardButton.classList.toggle("is-flipped", studyFlipped);
+  studyCardButton.setAttribute("aria-pressed", String(studyFlipped));
+  studyFrontFace.setAttribute("aria-hidden", String(studyFlipped));
+  studyBackFace.setAttribute("aria-hidden", String(!studyFlipped));
+  studyCardButton.setAttribute(
+    "aria-label",
+    studyFlipped ? "Show the prompt" : "Show the answer",
+  );
+  studyPreviousButton.disabled = studyIndex === 0;
+  studyNextButton.disabled = studyIndex === studyCardIds.length - 1;
+}
+
+function renderStudyCardWithoutFlipAnimation() {
+  studyCardButton.classList.add("no-flip-animation");
+  renderStudyCard();
+  studyCardButton.offsetWidth;
+  studyCardButton.classList.remove("no-flip-animation");
+}
+
+function startStudy() {
+  const deck = decks.find((item) => item.id === selectedDeckId);
+  if (!deck || deck.cards.length === 0) return;
+
+  cardSelectionMode = false;
+  selectedCardIds.clear();
+  studyCardIds = deck.cards.map((card) => card.id);
+  studyIndex = 0;
+  studyFlipped = false;
+  renderCards();
+  cardsView.hidden = true;
+  studyView.hidden = false;
+  renderStudyCard();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function shuffleStudyCards() {
+  for (let index = studyCardIds.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1));
+    [studyCardIds[index], studyCardIds[swapIndex]] = [
+      studyCardIds[swapIndex],
+      studyCardIds[index],
+    ];
+  }
+  studyIndex = 0;
+  studyFlipped = false;
+  renderStudyCardWithoutFlipAnimation();
+}
+
+function showCards() {
+  studyView.hidden = true;
+  cardsView.hidden = false;
+  renderCards();
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -285,6 +376,23 @@ cardForm.addEventListener("submit", (event) => {
 });
 
 backToDecksButton.addEventListener("click", showDecks);
+backToCardsButton.addEventListener("click", showCards);
+studyCardButton.addEventListener("click", () => {
+  studyFlipped = !studyFlipped;
+  renderStudyCard();
+});
+studyShuffleButton.addEventListener("click", shuffleStudyCards);
+studyPreviousButton.addEventListener("click", () => {
+  if (studyIndex === 0) return;
+  studyIndex -= 1;
+  renderStudyCardWithoutFlipAnimation();
+});
+studyNextButton.addEventListener("click", () => {
+  if (studyIndex >= studyCardIds.length - 1) return;
+  studyIndex += 1;
+  studyFlipped = false;
+  renderStudyCardWithoutFlipAnimation();
+});
 deckList.addEventListener("change", handleSelectionChange);
 deckList.addEventListener("click", handleDeckListClick);
 cardList.addEventListener("change", handleSelectionChange);
@@ -327,6 +435,9 @@ function handleToolbarAction(event, itemType) {
   if (!items) return;
 
   switch (action) {
+    case "study":
+      if (!isDeckToolbar) startStudy();
+      break;
     case "select":
       if (isDeckToolbar) deckSelectionMode = true;
       else cardSelectionMode = true;

@@ -471,6 +471,99 @@ textarea:focus {
   white-space: pre-wrap;
 }
 
+.study-heading {
+  margin-top: 34px;
+}
+
+.study-progress,
+.study-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.study-progress {
+  margin-bottom: 14px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.study-card {
+  display: block;
+  width: 100%;
+  min-height: 340px;
+  padding: 0;
+  border: 0;
+  border-radius: 16px;
+  background: transparent;
+  color: var(--ink);
+  perspective: 1000px;
+  text-align: left;
+}
+
+.study-card-inner {
+  position: relative;
+  display: block;
+  min-height: 340px;
+  transform-style: preserve-3d;
+  transition: transform 420ms ease;
+}
+
+.study-card.no-flip-animation .study-card-inner {
+  transition: none;
+}
+
+.study-card.is-flipped .study-card-inner {
+  transform: rotateY(180deg);
+}
+
+.study-card-face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  min-height: 340px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: 0 12px 30px rgb(32 43 39 / 6%);
+  backface-visibility: hidden;
+  text-align: center;
+}
+
+.study-card-back {
+  transform: rotateY(180deg);
+  background: #f1f7f2;
+}
+
+.study-card-text {
+  margin: 22px 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(24px, 4vw, 36px);
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.study-hint {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.study-navigation {
+  justify-content: center;
+  margin-top: 18px;
+}
+
+.study-navigation .button {
+  min-width: 126px;
+}
+
 @media (max-width: 640px) {
   .app-shell {
     width: min(100% - 28px, 520px);
@@ -500,6 +593,16 @@ textarea:focus {
 
   .card-create-form {
     grid-template-columns: 1fr;
+  }
+
+  .study-card,
+  .study-card-inner,
+  .study-card-face {
+    min-height: 280px;
+  }
+
+  .study-card-face {
+    padding: 24px;
   }
 
   .flashcard {

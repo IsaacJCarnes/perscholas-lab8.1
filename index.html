@@ -104,6 +104,9 @@
         </form>
 
         <div class="toolbar" role="toolbar" aria-label="Card actions">
+          <button class="button button-primary" data-action="study" type="button" disabled>
+            Study deck
+          </button>
           <button id="card-select-toggle" class="button button-secondary" data-action="select" type="button">Select</button>
           <span id="card-selection-count" class="selection-count" aria-live="polite"></span>
           <div id="card-selection-actions" class="toolbar-actions" hidden>
@@ -123,6 +126,55 @@
           <strong>No cards in this deck</strong>
           <span>Add your first card above.</span>
         </p>
+      </section>
+
+      <section id="study-view" aria-labelledby="study-heading" hidden>
+        <button id="back-to-cards" class="back-button" type="button">
+          <span aria-hidden="true">←</span> Back to cards
+        </button>
+
+        <div class="page-heading study-heading">
+          <p class="eyebrow">Study mode</p>
+          <h1 id="study-heading"></h1>
+          <p class="page-description">Try to recall the answer, then flip the card to check.</p>
+        </div>
+
+        <div class="study-progress">
+          <span id="study-position"></span>
+          <button id="study-shuffle" class="button button-secondary" type="button">
+            Shuffle
+          </button>
+        </div>
+
+        <button
+          id="study-card"
+          class="study-card"
+          type="button"
+          aria-pressed="false"
+          aria-label="Show the answer"
+        >
+          <span class="study-card-inner">
+            <span class="study-card-face study-card-front">
+              <span class="side-label">FRONT</span>
+              <span id="study-front" class="study-card-text"></span>
+              <span class="study-hint">Click to reveal answer</span>
+            </span>
+            <span class="study-card-face study-card-back" aria-hidden="true">
+              <span class="side-label">BACK</span>
+              <span id="study-back" class="study-card-text"></span>
+              <span class="study-hint">Click to show prompt</span>
+            </span>
+          </span>
+        </button>
+
+        <div class="study-navigation">
+          <button id="study-previous" class="button button-secondary" type="button">
+            <span aria-hidden="true">←</span> Previous
+          </button>
+          <button id="study-next" class="button button-primary" type="button">
+            Next <span aria-hidden="true">→</span>
+          </button>
+        </div>
       </section>
     </main>
 
