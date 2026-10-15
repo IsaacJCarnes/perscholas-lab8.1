@@ -1,0 +1,10 @@
+- Where AI saved time.
+  - AI was very good at generating the structure and could even fill in the details when given context.
+- At least one AI bug you identified and how you fixed it.
+  - When implementing the study view with an animation for flipping the card, the intended behavior is to flip back to the front while showing the previous/next card so the back is not revealed before the front. However, because of the animation speed the back was temporarily available while switching. I removed the flip when going to the previous card as we should have already seen that card and made it skip the flip animation when going forward so that the back is not accidentally revealed.
+- A code snippet you refactored for clarity.
+  - I refactored the code in two major ways. The first was reducing event listeners used by using event delegation on the card list, the deck list and the related toolbars. The second was I reduced some of the code complexity by changing from generating html in the javascript for the cards and decks to cloning the html from a template instead.
+- One accessibility improvement you added.
+  - I changed the delete button from being a singular button on every element to a select system which allows for more careful/specific deletion.
+- What prompt changes improved AI output.
+  - I asked for a summary of what could be done to simplify the code further after I had done a decent amount of work on it, and it give me suggestions to combine some functions from repeating features which was helpful.
